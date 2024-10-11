@@ -514,10 +514,10 @@ public:
       FreqOfMostAbundantRareFeature++;
 
     // Update local frequencies.
-    if (II)
+    if (II){
       std::cout << "[LibFuzzer] UpdateEnergy1 -> UpdateEnergy2" << std::endl;
-
       II->UpdateFeatureFrequency(Idx32);
+    }
   }
 
   size_t NumFeatures() const { return NumAddedFeatures; }
