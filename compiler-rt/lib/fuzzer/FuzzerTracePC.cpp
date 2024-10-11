@@ -761,6 +761,7 @@ void __sanitizer_weak_hook_strncmp(void *caller_pc, const char *s1,
 ATTRIBUTE_INTERFACE ATTRIBUTE_NO_SANITIZE_MEMORY
 void __sanitizer_weak_hook_strcmp(void *caller_pc, const char *s1,
                                    const char *s2, int result) {
+  std::cout << "[LibFuzzer] << __sanitizer_weak_hook_strcmp >> is being executed!" << std::endl;
   if (!fuzzer::RunningUserCallback) return;
   if (result == 0) return;  // No reason to mutate.
   size_t N = fuzzer::InternalStrnlen2(s1, s2);
@@ -771,6 +772,7 @@ void __sanitizer_weak_hook_strcmp(void *caller_pc, const char *s1,
 ATTRIBUTE_INTERFACE ATTRIBUTE_NO_SANITIZE_MEMORY
 void __sanitizer_weak_hook_strncasecmp(void *called_pc, const char *s1,
                                        const char *s2, size_t n, int result) {
+  std::cout << "[LibFuzzer] << __sanitizer_weak_hook_strncasecmp >> is being executed!" << std::endl;
   if (!fuzzer::RunningUserCallback) return;
   return __sanitizer_weak_hook_strncmp(called_pc, s1, s2, n, result);
 }
@@ -778,6 +780,8 @@ void __sanitizer_weak_hook_strncasecmp(void *called_pc, const char *s1,
 ATTRIBUTE_INTERFACE ATTRIBUTE_NO_SANITIZE_MEMORY
 void __sanitizer_weak_hook_strcasecmp(void *called_pc, const char *s1,
                                       const char *s2, int result) {
+  std::cout << "[LibFuzzer] << __sanitizer_weak_hook_strcasecmp >> is being executed!" << std::endl;
+
   if (!fuzzer::RunningUserCallback) return;
   return __sanitizer_weak_hook_strcmp(called_pc, s1, s2, result);
 }
@@ -785,6 +789,7 @@ void __sanitizer_weak_hook_strcasecmp(void *called_pc, const char *s1,
 ATTRIBUTE_INTERFACE ATTRIBUTE_NO_SANITIZE_MEMORY
 void __sanitizer_weak_hook_strstr(void *called_pc, const char *s1,
                                   const char *s2, char *result) {
+  std::cout << "[LibFuzzer] << __sanitizer_weak_hook_strstr >> is being executed!" << std::endl;
   if (!fuzzer::RunningUserCallback) return;
   fuzzer::TPC.MMT.Add(reinterpret_cast<const uint8_t *>(s2), strlen(s2));
 }
@@ -792,6 +797,7 @@ void __sanitizer_weak_hook_strstr(void *called_pc, const char *s1,
 ATTRIBUTE_INTERFACE ATTRIBUTE_NO_SANITIZE_MEMORY
 void __sanitizer_weak_hook_strcasestr(void *called_pc, const char *s1,
                                       const char *s2, char *result) {
+  std::cout << "[LibFuzzer] << __sanitizer_weak_hook_strcasestr >> is being executed!" << std::endl;
   if (!fuzzer::RunningUserCallback) return;
   fuzzer::TPC.MMT.Add(reinterpret_cast<const uint8_t *>(s2), strlen(s2));
 }
@@ -799,6 +805,8 @@ void __sanitizer_weak_hook_strcasestr(void *called_pc, const char *s1,
 ATTRIBUTE_INTERFACE ATTRIBUTE_NO_SANITIZE_MEMORY
 void __sanitizer_weak_hook_memmem(void *called_pc, const void *s1, size_t len1,
                                   const void *s2, size_t len2, void *result) {
+  std::cout << "[LibFuzzer] << __sanitizer_weak_hook_memmem >> is being executed!" << std::endl;
+
   if (!fuzzer::RunningUserCallback) return;
   fuzzer::TPC.MMT.Add(reinterpret_cast<const uint8_t *>(s2), len2);
 }

@@ -554,7 +554,6 @@ bool Fuzzer::RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile,
   size_t NumNewFeatures = Corpus.NumFeatureUpdates() - NumUpdatesBefore; // 입력 실행 전후에 새롭게 발견된 기능의 수를 계산
   if (NumNewFeatures || ForceAddToCorpus) { // 무조건 corpus에 추가하도록 바꿈
     std::cout << "[LibFuzzer - Fuzzer::RunOne] << if (NumNewFeatures || ForceAddToCorpus) >> is being executed!" << std::endl;
-
     TPC.UpdateObservedPCs(); // 프로그램 실행 도중 어떤 경로를 통해 새로운 코드 커버리지가 발생했는지 업데이트
     auto NewII = // 새로운 입력 corpus에 추가 !
         Corpus.AddToCorpus({Data, Data + Size}, NumNewFeatures, MayDeleteFile,
@@ -603,6 +602,7 @@ void Fuzzer::CrashOnOverwrittenData() {
 // is part of the stack unwinding. See D97975 for details.
 ATTRIBUTE_NOINLINE bool Fuzzer::ExecuteCallback(const uint8_t *Data,
                                                 size_t Size) {
+  std::cout << "[LibFuzzer] << Fuzzer::ExecuteCallback >> is being executed!" << std::endl;
   TPC.RecordInitialStack(); // 프로그램의 스택 상태를 기록 및 변동 추적.
   TotalNumberOfRuns++; // 현재까지 몇 번의 퍼징 실행이 이루어졌는지 총 실행 횟수를 추적하는 역할.
   assert(InFuzzingThread()); // 현재 이 함수가 퍼징을 실행하는 올바른 스레드에서 실행되고 있는지를 확인
@@ -720,6 +720,8 @@ void Fuzzer::TryDetectingAMemoryLeak(const uint8_t *Data, size_t Size,
 }
 
 void Fuzzer::MutateAndTestOne() {
+  std::cout << "[LibFuzzer] << Fuzzer::MutateAndTestOne >> is being executed!" << std::endl;
+
   MD.StartMutationSequence();
 
   auto &II = Corpus.ChooseUnitToMutate(MD.GetRand());
@@ -872,6 +874,8 @@ void Fuzzer::ReadAndExecuteSeedCorpora(std::vector<SizedFile> &CorporaFiles) {
 }
 
 void Fuzzer::Loop(std::vector<SizedFile> &CorporaFiles) {
+  std::cout << "[LibFuzzer] << Fuzzer::Loop >> is being executed!" << std::endl;
+
   auto FocusFunctionOrAuto = Options.FocusFunction;
   DFT.Init(Options.DataFlowTrace, &FocusFunctionOrAuto, CorporaFiles,
            MD.GetRand());
