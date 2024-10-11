@@ -82,6 +82,8 @@ struct InputInfo {
 // 수정
   void UpdateEnergy(size_t GlobalNumberOfFeatures, bool ScalePerExecTime,
                     std::chrono::microseconds AverageUnitExecutionTime) {
+    std::cout << "[LibFuzzer] << UpdateEnergy >> is being executed!" << std::endl;
+
     Energy = 0.0;
     SumIncidence = 0.0;
 
@@ -128,7 +130,9 @@ struct InputInfo {
         PerfScore = 150;
 
       Energy *= PerfScore;
-      std::cout << "<<UpdateEnergy>> distance 추가 이전 Energy 값: " << Energy << std::endl;
+    }
+    
+    std::cout << "<<UpdateEnergy>> distance 추가 이전 Energy 값: " << Energy << std::endl;
     
     // DGF 거리값 파일을 읽음
     double distance_value = 0.0;
@@ -156,7 +160,7 @@ struct InputInfo {
     // Energy 값을 출력하여 확인
     std::cout << "<<UpdateEnergy>> distance 추가 이후 Energy 값: " << Energy << std::endl;
 
-    }
+    
   }
 
   // Increment the frequency of the feature Idx.
@@ -164,7 +168,7 @@ struct InputInfo {
     NeedsEnergyUpdate = true;
     
     // 개별적인 입력(InputInfo)에 대해 로컬 빈도(local feature frequency)를 관리하는 로직
-    std::cout << "[LibFuzzer] << UpdateEnergy2 >> is being executed!" << std::endl;
+    std::cout << "[LibFuzzer] << UpdateFeatureFrequency >> is being executed!" << std::endl;
 
 
     // The local feature frequencies is an ordered vector of pairs.
@@ -497,7 +501,7 @@ public:
   void UpdateFeatureFrequency(InputInfo *II, size_t Idx) {
 
     // 전역적인 빈도(GlobalFeatureFreqs)를 관리하고, 드문 feature(rare feature)를 처리하는 로직
-    std::cout << "[LibFuzzer] << UpdateEnergy1 >> is being executed!" << std::endl;
+    std::cout << "[LibFuzzer] << UpdateFeatureFrequency1 >> is being executed!" << std::endl;
 
     uint32_t Idx32 = Idx % kFeatureSetSize;
 
@@ -518,7 +522,7 @@ public:
 
     // Update local frequencies.
     if (II){
-      std::cout << "[LibFuzzer] UpdateEnergy1 -> UpdateEnergy2" << std::endl;
+      std::cout << "[LibFuzzer] UpdateFeatureFrequency1 -> UpdateFeatureFrequency2" << std::endl;
       II->UpdateFeatureFrequency(Idx32);
     }
   }
