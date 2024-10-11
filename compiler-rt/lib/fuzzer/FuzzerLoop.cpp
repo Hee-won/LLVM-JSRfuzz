@@ -511,7 +511,7 @@ static void WriteEdgeToMutationGraphFile(const std::string &MutationGraphFile,
 bool Fuzzer::RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile,
                     InputInfo *II, bool ForceAddToCorpus,
                     bool *FoundUniqFeatures) {
-  std::cout << "[LibFuzzer] Fuzzer::RunOne is being executed!" << std::endl;
+  std::cout << "[LibFuzzer] << Fuzzer::RunOne >> is being executed!" << std::endl;
   if (!Size) // 입력 데이터의 Size가 0이면, 이 입력은 의미가 없으므로 false를 반환하여 실행을 종료.
     return false;
   // Largest input length should be INT_MAX. 
@@ -537,7 +537,7 @@ bool Fuzzer::RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile,
       // Corpus.AddFeature 함수는 새로운 기능(Feature)이 발견되면 이를 Corpus에 추가하고, 추가된 기능을 UniqFeatureSetTmp에 저장
       UniqFeatureSetTmp.push_back(Feature);
     if (Options.Entropic){ // 만약 Entropic Fuzzing이 설정되어 있다면, 새로운 기능의 빈도를 업데이트. 
-      std::cout << "[LibFuzzer - Fuzzer::RunOne] if (Options.Entropic) is being executed!" << std::endl;
+      std::cout << "[LibFuzzer - Fuzzer::RunOne] << if (Options.Entropic) >> is being executed!" << std::endl;
       Corpus.UpdateFeatureFrequency(II, Feature);
     }
     // II는 현재 테스트 중인 입력에 대한 정보를 담고 있는 구조체
@@ -553,6 +553,8 @@ bool Fuzzer::RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile,
   PrintPulseAndReportSlowInput(Data, Size); // 입력이 비정상적으로 오래 걸리는 경우 경고를 출력
   size_t NumNewFeatures = Corpus.NumFeatureUpdates() - NumUpdatesBefore; // 입력 실행 전후에 새롭게 발견된 기능의 수를 계산
   if (NumNewFeatures || ForceAddToCorpus) { // 무조건 corpus에 추가하도록 바꿈
+    std::cout << "[LibFuzzer - Fuzzer::RunOne] << if (NumNewFeatures || ForceAddToCorpus) >> is being executed!" << std::endl;
+
     TPC.UpdateObservedPCs(); // 프로그램 실행 도중 어떤 경로를 통해 새로운 코드 커버리지가 발생했는지 업데이트
     auto NewII = // 새로운 입력 corpus에 추가 !
         Corpus.AddToCorpus({Data, Data + Size}, NumNewFeatures, MayDeleteFile,

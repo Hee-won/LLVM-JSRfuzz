@@ -162,6 +162,10 @@ struct InputInfo {
   // Increment the frequency of the feature Idx.
   void UpdateFeatureFrequency(uint32_t Idx) {
     NeedsEnergyUpdate = true;
+    
+    // 개별적인 입력(InputInfo)에 대해 로컬 빈도(local feature frequency)를 관리하는 로직
+    std::cout << "[LibFuzzer] << UpdateEnergy2 >> is being executed!" << std::endl;
+
 
     // The local feature frequencies is an ordered vector of pairs.
     // If there are no local feature frequencies, push_back preserves order.
@@ -310,7 +314,7 @@ public:
 
   // Debug-only
   void PrintCorpus() {
-    if (!FeatureDebug) return;
+    // if (!FeatureDebug) return; 수
     Printf("======= CORPUS:\n");
     int i = 0;
     for (auto II : Inputs) {
@@ -488,6 +492,10 @@ public:
 
   // Increment frequency of feature Idx globally and locally.
   void UpdateFeatureFrequency(InputInfo *II, size_t Idx) {
+
+    // 전역적인 빈도(GlobalFeatureFreqs)를 관리하고, 드문 feature(rare feature)를 처리하는 로직
+    std::cout << "[LibFuzzer] << UpdateEnergy1 >> is being executed!" << std::endl;
+
     uint32_t Idx32 = Idx % kFeatureSetSize;
 
     // Saturated increment.
@@ -507,6 +515,8 @@ public:
 
     // Update local frequencies.
     if (II)
+      std::cout << "[LibFuzzer] UpdateEnergy1 -> UpdateEnergy2" << std::endl;
+
       II->UpdateFeatureFrequency(Idx32);
   }
 
@@ -564,6 +574,7 @@ private:
     //if (Entropic.Enabled) { // 이 옵션이 설정되어야만함... 지금까지는 안되어있었을 수도..? 그냥 지우는게 나을수
       for (auto II : Inputs) {
         if (II->NeedsEnergyUpdate && II->Energy != 0.0) {
+          std::cout << "[LibFuzzer - UpdateCorpusDistribution] if UpdateEnergy is being executed!" << std::endl;
           II->NeedsEnergyUpdate = false;
           II->UpdateEnergy(RareFeatures.size(), Entropic.ScalePerExecTime,
                            AverageUnitExecutionTime);
