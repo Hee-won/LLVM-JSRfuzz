@@ -560,10 +560,12 @@ private:
     // Skip update if no seeds or rare features were added/deleted.
     // Sparse updates for local change of feature frequencies,
     // i.e., randomly do not skip.
-    if (!DistributionNeedsUpdate &&
-        (!Entropic.Enabled || Rand(kSparseEnergyUpdates)))
+     if (!DistributionNeedsUpdate && 
+        (!Entropic.Enabled || Rand(kSparseEnergyUpdates))){
+      std::cout << "[LibFuzzer] << UpdateCorpusDistribution !!! >> is being executed!" << std::endl;
       return;
-
+     }
+      
     DistributionNeedsUpdate = false;
 
     size_t N = Inputs.size();
@@ -574,6 +576,7 @@ private:
 
     std::chrono::microseconds AverageUnitExecutionTime(0);
     for (auto II : Inputs) {
+      std::cout << "[LibFuzzer - UpdateCorpusDistribution] for(auto II : Inputs) is being executed!" << std::endl;
       AverageUnitExecutionTime += II->TimeOfUnit;
     }
     AverageUnitExecutionTime /= N;
