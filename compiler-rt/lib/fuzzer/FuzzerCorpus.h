@@ -560,8 +560,7 @@ private:
     // Skip update if no seeds or rare features were added/deleted.
     // Sparse updates for local change of feature frequencies,
     // i.e., randomly do not skip.
-     if (!DistributionNeedsUpdate && 
-        (!Entropic.Enabled || Rand(kSparseEnergyUpdates))){
+     if (!DistributionNeedsUpdate && Rand(kSparseEnergyUpdates)){
       std::cout << "[LibFuzzer] << UpdateCorpusDistribution !!! >> is being executed!" << std::endl;
       return;
      }
