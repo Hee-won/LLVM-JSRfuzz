@@ -22,6 +22,8 @@
 #include <numeric>
 #include <random>
 #include <unordered_set>
+#include <fstream>
+
 
 namespace fuzzer {
 

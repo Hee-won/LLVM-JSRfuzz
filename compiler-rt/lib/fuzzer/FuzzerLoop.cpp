@@ -536,9 +536,10 @@ bool Fuzzer::RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile,
     if (Corpus.AddFeature(Feature, static_cast<uint32_t>(Size), Options.Shrink))
       // Corpus.AddFeature 함수는 새로운 기능(Feature)이 발견되면 이를 Corpus에 추가하고, 추가된 기능을 UniqFeatureSetTmp에 저장
       UniqFeatureSetTmp.push_back(Feature);
-    if (Options.Entropic) // 만약 Entropic Fuzzing이 설정되어 있다면, 새로운 기능의 빈도를 업데이트. 
+    if (Options.Entropic){ // 만약 Entropic Fuzzing이 설정되어 있다면, 새로운 기능의 빈도를 업데이트. 
       std::cout << "[LibFuzzer - Fuzzer::RunOne] if (Options.Entropic) is being executed!" << std::endl;
-      Corpus.UpdateFeatureFrequency(II, Feature); 
+      Corpus.UpdateFeatureFrequency(II, Feature);
+    }
     // II는 현재 테스트 중인 입력에 대한 정보를 담고 있는 구조체
     if (Options.ReduceInputs && II && !II->NeverReduce) // 입력을 줄이거나 최소화(reduce)할지 여부를 결정
       // std::binary_search는 해당 입력이 발견한 특정 피처(Feature)가 II->UniqFeatureSet에 포함되어 있는지를 확인합니다.
