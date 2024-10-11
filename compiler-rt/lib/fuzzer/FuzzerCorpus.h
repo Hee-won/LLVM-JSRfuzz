@@ -349,6 +349,8 @@ public:
 
   // Corpus에서 변이를 적용할 입력을 가중치를 기반으로 선택
   InputInfo &ChooseUnitToMutate(Random &Rand) {
+    std::cout << "[LibFuzzer] << ChooseUnitToMutate >> is being executed!" << std::endl;
+
     InputInfo &II = *Inputs[ChooseUnitIdxToMutate(Rand)];
     assert(!II.U.empty());
     return II;
@@ -366,6 +368,7 @@ public:
   // Returns an index of random unit from the corpus to mutate.
   // Corpus에 있는 데이터에 대해 가중치 기반 분포를 사용하여 변이를 적용할 입력의 인덱스를 선택
   size_t ChooseUnitIdxToMutate(Random &Rand) {
+    std::cout << "[LibFuzzer] << ChooseUnitIdxToMutate >> is being executed!" << std::endl;
     UpdateCorpusDistribution(Rand);
     size_t Idx = static_cast<size_t>(CorpusDistribution(Rand));
     assert(Idx < Inputs.size());
@@ -549,6 +552,7 @@ private:
   // Hypothesis: inputs that maximize information about globally rare features
   // are interesting.
   void UpdateCorpusDistribution(Random &Rand) {
+    std::cout << "[LibFuzzer] << UpdateCorpusDistribution >> is being executed!" << std::endl;
     // Skip update if no seeds or rare features were added/deleted.
     // Sparse updates for local change of feature frequencies,
     // i.e., randomly do not skip.

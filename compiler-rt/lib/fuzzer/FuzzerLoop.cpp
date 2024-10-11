@@ -722,10 +722,10 @@ void Fuzzer::TryDetectingAMemoryLeak(const uint8_t *Data, size_t Size,
 void Fuzzer::MutateAndTestOne() {
   std::cout << "[LibFuzzer] << Fuzzer::MutateAndTestOne >> is being executed!" << std::endl;
 
-  MD.StartMutationSequence();
+  MD.StartMutationSequence(); //  현재 퍼징 단계에서 변형을 초기화
 
-  auto &II = Corpus.ChooseUnitToMutate(MD.GetRand());
-  if (Options.DoCrossOver) {
+  auto &II = Corpus.ChooseUnitToMutate(MD.GetRand()); // 현재 입력(시드)을 선택
+  if (Options.DoCrossOver) { // 두 개의 입력을 합칠 수 있
     auto &CrossOverII = Corpus.ChooseUnitToCrossOverWith(
         MD.GetRand(), Options.CrossOverUniformDist);
     MD.SetCrossOverWith(&CrossOverII.U);
@@ -744,6 +744,8 @@ void Fuzzer::MutateAndTestOne() {
   assert(CurrentMaxMutationLen > 0);
 
   for (int i = 0; i < Options.MutateDepth; i++) {
+    std::cout << "[LibFuzzer] Mutate Depth iteration: " << i + 1 << " / " << Options.MutateDepth << std::endl;
+    // 설정된 횟수만큼 변형 및 테스트를 반복
     if (TotalNumberOfRuns >= Options.MaxNumberOfRuns)
       break;
     if (ReturnRequested)
