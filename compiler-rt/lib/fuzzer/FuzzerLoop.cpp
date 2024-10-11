@@ -507,21 +507,28 @@ static void WriteEdgeToMutationGraphFile(const std::string &MutationGraphFile,
   AppendToFile(OutputString, MutationGraphFile);
 }
 
+// 단일 입력 데이터(즉, 하나의 fuzzing 시도)를 처리하는 함수
 bool Fuzzer::RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile,
                     InputInfo *II, bool ForceAddToCorpus,
                     bool *FoundUniqFeatures) {
+  std::cout << "[LibFuzzer] Fuzzer::RunOne is being executed!" << std::endl;
   if (!Size) // 입력 데이터의 Size가 0이면, 이 입력은 의미가 없으므로 false를 반환하여 실행을 종료.
     return false;
-  // Largest input length should be INT_MAX. 매우 큰 입력 데이터를 처리할 때, 오류를 방지하기 위한 조건.
+  // Largest input length should be INT_MAX. 
+  // 매우 큰 입력 데이터를 처리할 때, 오류를 방지하기 위한 조건.
   assert(Size < std::numeric_limits<uint32_t>::max());
 
-// 주어진 입력 Data를 기반으로 실제 목표 프로그램을 실행하는 함수. 실행 결과가 실패하면 false를 반환하고 종료.
+  // 주어진 입력 Data를 기반으로 실제 목표 프로그램을 실행하는 함수. 
+  // 실행 결과가 실패하면 false를 반환하고 종료.
   if(!ExecuteCallback(Data, Size)) return false; // 프로그램 실행, 커버리지 측정 시작
-  auto TimeOfUnit = duration_cast<microseconds>(UnitStopTime - UnitStartTime); // 입력 데이터의 실행 시간을 측정. 이 값은 나중에 Corpus에 입력을 추가할 때 참고됨
+  auto TimeOfUnit = duration_cast<microseconds>(UnitStopTime - UnitStartTime); 
+  // 입력 데이터의 실행 시간을 측정. 이 값은 나중에 Corpus에 입력을 추가할 때 참고됨
 
   UniqFeatureSetTmp.clear(); // 새롭게 발견된 기능(feature)을 임시로 저장할 벡터인 UniqFeatureSetTmp을 비움
   size_t FoundUniqFeaturesOfII = 0; // 현재 입력에서 발견된 새로운 유일한 기능(Unique Features)의 수를 저장할 변수를 초기화
-  size_t NumUpdatesBefore = Corpus.NumFeatureUpdates(); // 입력이 실행되기 전의 Corpus에서 기능 업데이트 수를 저장. 이는 이후 새로운 기능이 발견된 수를 계산하는 데 사용.
+  size_t NumUpdatesBefore = Corpus.NumFeatureUpdates(); 
+  // 입력이 실행되기 전의 Corpus에서 기능 업데이트 수를 저장. 
+  // 이는 이후 새로운 기능이 발견된 수를 계산하는 데 사용.
 
   // 프로그램이 실행된 후 발견된 커버리지(coverage) 또는 기능(feature)을 수집하는 부분. 
   // CollectFeatures는 프로그램이 실행 중 탐색한 기능(Feature)들을 하나씩 확인하면서 콜백을 통해 처리.
@@ -529,10 +536,13 @@ bool Fuzzer::RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile,
     if (Corpus.AddFeature(Feature, static_cast<uint32_t>(Size), Options.Shrink))
       // Corpus.AddFeature 함수는 새로운 기능(Feature)이 발견되면 이를 Corpus에 추가하고, 추가된 기능을 UniqFeatureSetTmp에 저장
       UniqFeatureSetTmp.push_back(Feature);
-    if (Options.Entropic) // 만약 Entropic Fuzzing이 설정되어 있다면, 새로운 기능의 빈도를 업데이트. Entropic Fuzzing은 특정 기능의 빈도에 따라 입력 데이터를 생성하는 방식
-      Corpus.UpdateFeatureFrequency(II, Feature);
-    if (Options.ReduceInputs && II && !II->NeverReduce)
-      if (std::binary_search(II->UniqFeatureSet.begin(),
+    if (Options.Entropic) // 만약 Entropic Fuzzing이 설정되어 있다면, 새로운 기능의 빈도를 업데이트. 
+      std::cout << "[LibFuzzer - Fuzzer::RunOne] if (Options.Entropic) is being executed!" << std::endl;
+      Corpus.UpdateFeatureFrequency(II, Feature); 
+    // II는 현재 테스트 중인 입력에 대한 정보를 담고 있는 구조체
+    if (Options.ReduceInputs && II && !II->NeverReduce) // 입력을 줄이거나 최소화(reduce)할지 여부를 결정
+      // std::binary_search는 해당 입력이 발견한 특정 피처(Feature)가 II->UniqFeatureSet에 포함되어 있는지를 확인합니다.
+      if (std::binary_search(II->UniqFeatureSet.begin(), // UniqFeatureSet은 해당 입력이 유일하게 트리거한 피처들을 포함하는 집합
                              II->UniqFeatureSet.end(), Feature))
         FoundUniqFeaturesOfII++; 
   });
@@ -541,16 +551,16 @@ bool Fuzzer::RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile,
     *FoundUniqFeatures = FoundUniqFeaturesOfII;
   PrintPulseAndReportSlowInput(Data, Size); // 입력이 비정상적으로 오래 걸리는 경우 경고를 출력
   size_t NumNewFeatures = Corpus.NumFeatureUpdates() - NumUpdatesBefore; // 입력 실행 전후에 새롭게 발견된 기능의 수를 계산
-  if (NumNewFeatures || ForceAddToCorpus) {
-    TPC.UpdateObservedPCs();
-    auto NewII =
+  if (NumNewFeatures || ForceAddToCorpus) { // 무조건 corpus에 추가하도록 바꿈
+    TPC.UpdateObservedPCs(); // 프로그램 실행 도중 어떤 경로를 통해 새로운 코드 커버리지가 발생했는지 업데이트
+    auto NewII = // 새로운 입력 corpus에 추가 !
         Corpus.AddToCorpus({Data, Data + Size}, NumNewFeatures, MayDeleteFile,
                            TPC.ObservedFocusFunction(), ForceAddToCorpus,
                            TimeOfUnit, UniqFeatureSetTmp, DFT, II);
     WriteFeatureSetToFile(Options.FeaturesDir, Sha1ToString(NewII->Sha1),
-                          NewII->UniqFeatureSet);
+                          NewII->UniqFeatureSet); // 새로운 입력이 유니크한 피처를 가지고 있다면, 그 피처 세트를 파일로 저장
     WriteEdgeToMutationGraphFile(Options.MutationGraphFile, NewII, II,
-                                 MD.MutationSequence());
+                                 MD.MutationSequence()); // 이 새로운 입력과 기존 입력(II) 간의 변형 과정을 기록
     return true;
   }
 

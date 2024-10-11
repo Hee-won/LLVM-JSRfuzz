@@ -77,6 +77,7 @@ struct InputInfo {
   // 만약 ScalePerExecTime이 true로 설정되어 있으면, 계산된 엔트로피는 해당 입력이 다른 입력의 평균 실행 시간과 비교해 얼마나 빠르게 실행되는지에 따라 조정됩니다. 
   // 입력이 빠르게 실행될수록 더 많은 에너지가 그 입력에 할당됩니다.
 
+// 수정
   void UpdateEnergy(size_t GlobalNumberOfFeatures, bool ScalePerExecTime,
                     std::chrono::microseconds AverageUnitExecutionTime) {
     Energy = 0.0;
@@ -125,8 +126,34 @@ struct InputInfo {
         PerfScore = 150;
 
       Energy *= PerfScore;
+      std::cout << "<<UpdateEnergy>> distance 추가 이전 Energy 값: " << Energy << std::endl;
     
-    // DGF 거리 값을 이용한 에너지 계산값 넣기!
+    // DGF 거리값 파일을 읽음
+    double distance_value = 0.0;
+    std::ifstream distance_file("distance_value_for_entropic.txt");
+    if (distance_file.is_open()) {
+        distance_file >> distance_value;
+        distance_file.close();
+    } else {
+        // 파일을 열지 못했을 경우 기본 거리값 설정
+        distance_value = 100.0;
+        std::cout << "[LibFuzzer] UpdateEnergy Error!" << std::endl;
+    }
+
+    // 거리값 정규화: 상한선 및 하한선 설정
+    const double max_distance = 100.0; // 예시: 최대 거리값을 100으로 설정
+    const double min_distance = 1.0;   // 예시: 최소 거리값을 1로 설정
+    distance_value = std::min(std::max(distance_value, min_distance), max_distance); // 최대최소제한
+
+    // 거리값을 로그로 정규화
+    double normalized_distance = log(distance_value);
+
+    // 정규화된 거리값을 에너지에 추가
+    Energy += normalized_distance; // 거리를 에너지원으로 추가
+
+    // Energy 값을 출력하여 확인
+    std::cout << "<<UpdateEnergy>> distance 추가 이후 Energy 값: " << Energy << std::endl;
+
     }
   }
 

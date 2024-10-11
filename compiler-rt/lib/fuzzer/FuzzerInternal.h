@@ -69,7 +69,7 @@ public:
   // and true otherwise.
   bool ExecuteCallback(const uint8_t *Data, size_t Size);
   bool RunOne(const uint8_t *Data, size_t Size, bool MayDeleteFile = false,
-              InputInfo *II = nullptr, bool ForceAddToCorpus = false,
+              InputInfo *II = nullptr, bool ForceAddToCorpus = true, // 수정 ForceAddToCorpus를 true로 해줘야 다 넣어줌
               bool *FoundUniqFeatures = nullptr);
   void TPCUpdateObservedPCs();
 
