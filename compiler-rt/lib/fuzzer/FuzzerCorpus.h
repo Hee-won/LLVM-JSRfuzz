@@ -44,7 +44,7 @@ struct InputInfo {
   std::vector<uint32_t> UniqFeatureSet; // 이거는 그냥 구조체인가? 이걸 사용하여 여기에 값을 넣는 함수를 바꿔야하
   std::vector<uint8_t> DataFlowTraceForFocusFunction;
   // Power schedule.
-  bool NeedsEnergyUpdate = false;
+  bool NeedsEnergyUpdate = true;
   double Energy = 0.0;
   double SumIncidence = 0.0;
   std::vector<std::pair<uint32_t, uint16_t>> FeatureFreqs;
@@ -583,7 +583,7 @@ private:
     bool VanillaSchedule = true;
     //if (Entropic.Enabled) { // 이 옵션이 설정되어야만함... 지금까지는 안되어있었을 수도..? 그냥 지우는게 나을수
       for (auto II : Inputs) {
-        if (II->NeedsEnergyUpdate && II->Energy != 0.0) {
+        if (II->NeedsEnergyUpdate && II->Energy != 0.0) { 
           std::cout << "[LibFuzzer - UpdateCorpusDistribution] if UpdateEnergy is being executed!" << std::endl;
           II->NeedsEnergyUpdate = false;
           II->UpdateEnergy(RareFeatures.size(), Entropic.ScalePerExecTime,
